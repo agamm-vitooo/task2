@@ -76,62 +76,56 @@
     </table>
 
     <script>
-        // Fungsi untuk menghitung angsuran dan jadwal
-        function hitungAngsuran() {
-            // Ambil input dari form
-            const OTR = parseFloat(document.getElementById('otr').value);
-            const DP_PERCENTAGE = parseFloat(document.getElementById('dpPercentage').value) / 100;
-            const JANGKA_WAKTU = parseInt(document.getElementById('jangkaWaktu').value);
-            const BUNGA_TAHUNAN = parseFloat(document.getElementById('bungaTahunan').value) / 100;
+        // Fungsi untuk mendapatkan elemen berdasarkan ID
+        function getElement(id) {
+            return document.getElementById(id);
+        }
 
-            // Menghitung DP dan pokok utang
+        // Fungsi untuk menghitung angsuran
+        function hitungAngsuran() {
+            const OTR = parseFloat(getElement('otr').value);
+            const DP_PERCENTAGE = parseFloat(getElement('dpPercentage').value) / 100;
+            const JANGKA_WAKTU = parseInt(getElement('jangkaWaktu').value);
+            const BUNGA_TAHUNAN = parseFloat(getElement('bungaTahunan').value) / 100;
+
             const DP = OTR * DP_PERCENTAGE;
             const pokokUtang = OTR - DP;
-
-            // Menghitung bunga total selama jangka waktu
             const bungaTotal = pokokUtang * (BUNGA_TAHUNAN * (JANGKA_WAKTU / 12));
-
-            // Menghitung total yang harus dibayar
             const totalHutang = pokokUtang + bungaTotal;
-
-            // Menghitung angsuran bulanan
             const angsuranBulanan = totalHutang / JANGKA_WAKTU;
 
-            // Menampilkan hasil perhitungan angsuran bulanan
-            document.getElementById('hasil').innerText = `Angsuran Bulanan: Rp${angsuranBulanan.toLocaleString('id-ID')}`;
-
-            // Buat jadwal angsuran
+            tampilkanHasil(angsuranBulanan);
             buatJadwalAngsuran(JANGKA_WAKTU, angsuranBulanan);
+        }
+
+        // Fungsi untuk menampilkan hasil angsuran
+        function tampilkanHasil(angsuranBulanan) {
+            getElement('hasil').innerText = `Angsuran Bulanan: Rp${angsuranBulanan.toLocaleString('id-ID')}`;
         }
 
         // Fungsi untuk membuat jadwal angsuran
         function buatJadwalAngsuran(jumlahBulan, angsuranPerBulan) {
-            const tbody = document.getElementById('jadwalAngsuran').querySelector('tbody');
-            tbody.innerHTML = ''; // Hapus isi tabel sebelumnya
+            const tbody = getElement('jadwalAngsuran').querySelector('tbody');
+            tbody.innerHTML = ''; // Kosongkan isi tabel sebelumnya
 
             let tanggal = new Date(2024, 0, 25); // Mulai angsuran dari 25 Januari 2024
 
             for (let i = 1; i <= jumlahBulan; i++) {
-                // Buat baris untuk jadwal angsuran
                 const tr = document.createElement('tr');
-
-                const tdAngsuranKe = document.createElement('td');
-                tdAngsuranKe.textContent = i;
-                tr.appendChild(tdAngsuranKe);
-
-                const tdAngsuranPerBulan = document.createElement('td');
-                tdAngsuranPerBulan.textContent = `Rp${angsuranPerBulan.toLocaleString('id-ID')}`;
-                tr.appendChild(tdAngsuranPerBulan);
-
-                const tdTanggalJatuhTempo = document.createElement('td');
-                tdTanggalJatuhTempo.textContent = tanggal.toISOString().split('T')[0];
-                tr.appendChild(tdTanggalJatuhTempo);
+                tr.appendChild(buatSel(i)); // Angsuran ke
+                tr.appendChild(buatSel(`Rp${angsuranPerBulan.toLocaleString('id-ID')}`)); // Angsuran per bulan
+                tr.appendChild(buatSel(tanggal.toISOString().split('T')[0])); // Tanggal jatuh tempo
 
                 tbody.appendChild(tr);
-
-                // Tambah satu bulan untuk jatuh tempo berikutnya
-                tanggal.setMonth(tanggal.getMonth() + 1);
+                tanggal.setMonth(tanggal.getMonth() + 1); // Tambah satu bulan
             }
+        }
+
+        // Fungsi pembantu untuk membuat elemen <td>
+        function buatSel(konten) {
+            const td = document.createElement('td');
+            td.textContent = konten;
+            return td;
         }
     </script>
 
