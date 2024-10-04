@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Angsuran Pak Sugus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        label,
+        input {
+            display: block;
+            margin: 10px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Kalkulator Angsuran Pak Sugus</h2>
+
+    <!-- Form input -->
+    <form id="angsuranForm">
+        <label for="otr">Harga Mobil (OTR):</label>
+        <input type="number" id="otr" value="240000000" required>
+
+        <label for="dpPercentage">Down Payment (DP) %:</label>
+        <input type="number" id="dpPercentage" value="20" required>
+
+        <label for="jangkaWaktu">Jangka Waktu (Bulan):</label>
+        <input type="number" id="jangkaWaktu" value="18" required>
+
+        <label for="bungaTahunan">Bunga Tahunan (%):</label>
+        <input type="number" id="bungaTahunan" value="14" required>
+
+        <button type="button" onclick="hitungAngsuran()">Hitung Angsuran</button>
+    </form>
+
+    <!-- Tempat hasil angsuran -->
+    <h3>Hasil Perhitungan:</h3>
+    <p id="hasil"></p>
+
+    <!-- Tabel jadwal angsuran -->
+    <h3>Jadwal Angsuran:</h3>
+    <table id="jadwalAngsuran">
+        <thead>
+            <tr>
+                <th>Angsuran Ke</th>
+                <th>Angsuran Per Bulan</th>
+                <th>Tanggal Jatuh Tempo</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        // Fungsi untuk menghitung angsuran dan jadwal
+        function hitungAngsuran() {
+            // Ambil input dari form
+            const OTR = parseFloat(document.getElementById('otr').value);
+            const DP_PERCENTAGE = parseFloat(document.getElementById('dpPercentage').value) / 100;
+            const JANGKA_WAKTU = parseInt(document.getElementById('jangkaWaktu').value);
+            const BUNGA_TAHUNAN = parseFloat(document.getElementById('bungaTahunan').value) / 100;
+
+            // Menghitung DP dan pokok utang
+            const DP = OTR * DP_PERCENTAGE;
+            const pokokUtang = OTR - DP;
+
+            // Menghitung bunga total selama jangka waktu
+            const bungaTotal = pokokUtang * (BUNGA_TAHUNAN * (JANGKA_WAKTU / 12));
+
+            // Menghitung total yang harus dibayar
+            const totalHutang = pokokUtang + bungaTotal;
+
+            // Menghitung angsuran bulanan
+            const angsuranBulanan = totalHutang / JANGKA_WAKTU;
+
+            // Menampilkan hasil perhitungan angsuran bulanan
+            document.getElementById('hasil').innerText = `Angsuran Bulanan: Rp${angsuranBulanan.toLocaleString('id-ID')}`;
+
+            // Buat jadwal angsuran
+            buatJadwalAngsuran(JANGKA_WAKTU, angsuranBulanan);
+        }
+
+        // Fungsi untuk membuat jadwal angsuran
+        function buatJadwalAngsuran(jumlahBulan, angsuranPerBulan) {
+            const tbody = document.getElementById('jadwalAngsuran').querySelector('tbody');
+            tbody.innerHTML = ''; // Hapus isi tabel sebelumnya
+
+            let tanggal = new Date(2024, 0, 25); // Mulai angsuran dari 25 Januari 2024
+
+            for (let i = 1; i <= jumlahBulan; i++) {
+                // Buat baris untuk jadwal angsuran
+                const tr = document.createElement('tr');
+
+                const tdAngsuranKe = document.createElement('td');
+                tdAngsuranKe.textContent = i;
+                tr.appendChild(tdAngsuranKe);
+
+                const tdAngsuranPerBulan = document.createElement('td');
+                tdAngsuranPerBulan.textContent = `Rp${angsuranPerBulan.toLocaleString('id-ID')}`;
+                tr.appendChild(tdAngsuranPerBulan);
+
+                const tdTanggalJatuhTempo = document.createElement('td');
+                tdTanggalJatuhTempo.textContent = tanggal.toISOString().split('T')[0];
+                tr.appendChild(tdTanggalJatuhTempo);
+
+                tbody.appendChild(tr);
+
+                // Tambah satu bulan untuk jatuh tempo berikutnya
+                tanggal.setMonth(tanggal.getMonth() + 1);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
